@@ -53,13 +53,27 @@ HTTP Services/APIs to connect Front-end and Back-end
 
 // 4 - Setting Up the Development Environment
 
+******
+Setting up GIT
+
+$mkdir mosh
+$cd mosh
+$git init
+$git remote add origin https://github.com/slav73/angular_mosh.git
+$git push -u origin master
+*******
+
+$node --version
+
 The minimal node version for Angular is 6.9
 
-We need Angular CLI:
+We need Angular CLI (Command Line Interface):
 
 $npm install -g @angular/cli
 
 Then 'ng --version' shows the current version of angular on your comp
+
+// 05 - Your First Angular App
 
 **************
 !!$ng new project-name creates a new Angular project
