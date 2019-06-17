@@ -133,7 +133,6 @@ angular-cli.json - config for or CLI
 
 package.json
 
-
 // 7 - Webpack
 
 Let's change file 'src/app/app.component.ts':
@@ -149,8 +148,8 @@ export class AppComponent {
 Changes the title of our page - automatically, after compiling with Webpack in Mosh case, but in modern
 version of Angular it called 'wdm' - Window Deployment Manager.
 
-This feature is called 'Hot Module Replacement'
-
+This feature is called HMR - 'Hot Module Replacement (Reloading)'
+ 
 // 8 - Angular Version History
 
 AngularJS - 2010 - a JS Framework for building client apps
@@ -190,4 +189,9 @@ Advanced Topics:
 
 Final Project = building a real-life app
 
+We can skip reactive forms, consming HTTP-services, auth/author
 
+//10 - Making a Promise
+
+I PROMISE TO WATCH THE ESSENTIALS OF THIS COURSE AND BUILD A REAL-LIFE
+E-COMMERCE APPLICATION!!
