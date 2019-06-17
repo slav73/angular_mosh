@@ -107,13 +107,32 @@ Every app has at least one module and one component.
 
 In 'assets' folder we store all the static files
 
-"environments" - here we store different configuration settings for our environments.
+"environments" - here we store different configuration settings for our environments:
+environment.prod.ts - production env
+environment.ts - dev env.
 
 The other files - favicon, index.html are self-explanatory.
 
 The 'main.ts' file is a starting point for our application.
 
 'polyfills.ts' file imports some files that are required to run Angular.
+
+styles.css - for CSS
+
+test.ts - for tests
+
+karma.config.js
+
+outside the src folder we have 
+
+angular-cli.json - config for or CLI
+
+.editorconfig - config settings for our programmers team
+
+.gitignore
+
+package.json
+
 
 // 7 - Webpack
 
