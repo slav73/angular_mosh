@@ -1,5 +1,7 @@
-let message;
+import { LikeComponent } from "./like.component";
 
-message = "abs";
-
-let endsWith = (<string>message).endsWith("c");
+let component = new LikeComponent(10, true);
+component.onClick();
+console.log(
+  `likesCount: ${component.likesCount}, isSelected: ${component.isSelected}`
+);
