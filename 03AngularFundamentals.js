@@ -433,15 +433,16 @@ export class AuthorsComponent {
 }
 ========
 
-'src/app/authors/authors.component.html':
+Template:
 
 =====
-<h1>{{ authors.length }} Authors:</h1>
-
-<ul>
-  <li *ngFor="let author of authors">
-    {{ author }}
-  </li>
-</ul>
-=====
-
+@Component({
+  selector: "authors",
+  template: `
+    <h2>{{ authors.length + " Authors:" }}</h2>
+    <ul>
+      <li *ngFor="let author of authors">{{ author }}</li>
+    </ul>
+  `
+})
+====

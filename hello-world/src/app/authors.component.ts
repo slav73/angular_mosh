@@ -8,11 +8,16 @@ import { AuthorsService } from "./authors.service";
     <ul>
       <li *ngFor="let author of authors">{{ author }}</li>
     </ul>
+    <table>
+      <tr>
+        <td [attr.colspan]="colSpan"></td>
+      </tr>
+    </table>
   `
 })
 export class AuthorsComponent {
   authors;
-
+  colSpan = 2;
   constructor(service: AuthorsService) {
     this.authors = service.getAuthors();
   }
