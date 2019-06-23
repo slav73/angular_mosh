@@ -22,10 +22,32 @@ Similarly we used "event binding" to supply events raised in the DOM-object:
 
 <button (click)="onClick()"></button>
 
-In this case when clicking a button, "click" event is arised, and it triggers execution of "onClick()" method in Angular 
-component.
+In this case when clicking a button, "click" event is arised, and it triggers execution of "onClick()" 
+method in Angular component.
 
-Переменные, находящиеся в классе, называются "полями" (fields).
+Ideally, we want to set initial state of our component - using some object
+that we have in the host component 
+
+For example, here in the App component we get the 'POST' obj from the server.
+
+=====
+export class AppComponent {
+  post = {
+    title: "Title",
+    isFavorite: true
+  };
+}
+=====
+
+In the template of App component we want to display this post and, if it's set
+to 'favorite', we want to render the 'favorite' icon as a fool star.
+
+Now we can't use our 'favorite' property in the <favorite></favorite>,
+nor can we set up some events based on user actions - though we got
+'isFavorite' and it's visible to all
+
+We have to make some input and output working when dealing with our 'favorite'
+component. These inputs and outputs make what we call 'Component API'
 
 // 3 - Input Properties
 
@@ -48,7 +70,7 @@ In component we could mark the field as a property to use in property binding ex
 
 1 approach
 
-Import 'Input' lib:
+Import a decorator 'Input' lib:
 
 =====
 import { Component, OnInit, Input } from "@angular/core";
@@ -78,7 +100,7 @@ We can declare 'inputs' as another decorator:
   })
 ======
 
-But the problem with this approach is if we in the future rename the valiable in the class core,
+But the problem with this approach is if we in the future rename the variable in the class core,
 the code won't work.
 
 Lets return to the first approach:
@@ -95,10 +117,27 @@ Thus we can use the following trick to assign an alias to this var:
 
 @Input('is-favorite') isFavorite: boolean;
 
+Using of alias has another benefit: it keeps the component API stable
+
+*******
+By pressing "fn + F2" we select all the occurences of the selected text on the page
+*******
+
+Let's imagine we renamed our var to 'isSelected' - and our APP will be broken
+
+But if we apply the alias - everything will be OK
+Though our star won't switch it's status - because we need to change 
+the var names in our favorite.html also
+
+The lesson:
+If your're building reusable components, give your input properties
+alias and keep the contracts of your components stable
+
 // 5 - Output Properties
 
 Say we want to be notified when the user clicks on the 'favorite ' component.
 
+First we create a custom event 'change':
 =====
 <app-favorite
   [is-favorite]="post.isFavorite"
@@ -127,7 +166,9 @@ instantiates a new instance of a class 'EventEmitter()':
 @Output() change = new EventEmitter();
 =====
 
-We also need to add EventEmitter() to 'import' block @angular/core
+We also need to add EventEmitter() to 'import' block @angular/core:
+import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
+
 
 Then - after we toggle the "selected" field - we want to raise an event. It will 'publish', or notify
 others that something has happened.
@@ -148,6 +189,9 @@ onClick() {
 =====
 this.change.emit(this.isSelected);
 =====
+
+Эти данные будут доступны для всех подписчиков данного события. В нашем случае -
+это основная компонента App
 
 2. Затем эти данные нужно принять -  в файле 'app.component.html', в котором мы и отображаем компонент 'favorite',
 указываем 
@@ -195,6 +239,31 @@ onFavoriteChanged(eventArgs) {
   }
 ====
 
+Мы можем проверять типы передаваемых данных
+onFavoriteChanged(eventArgs: { newValue: boolean}) {
+
+Что-то слишком многословно
+
+В перспективе можно описать интерфейс для передаваемых данных.
+В файле app.ts:
+
+interface FavoriteChangedEventArgs {
+  newValue: boolean
+}
+and 
+
+onFavoriteChanged(eventArgs: FavoriteChangedEventArgs) {
+
+Если мы планируем стать знаменитыми и распространять наш код,
+лучше вынести объявление интерфейса в его родную гавань -
+favorite.ts:
+
+export interface FavoriteChangedEventArgs {
+  newValue: boolean
+}
+
+И заимпортить его где нада - в App.ts
+
 // 7 - Aliasing Output Properties
 
 =====
@@ -216,28 +285,47 @@ One way to use a template is to specify its URL in 'templateUrl':
   })
 ===  
 
-Or just simply type it inline:
+Or just simply type it inline in backticks (to inject some JS code)
+or in single quotes:
 
 ===
 @Component({
     selector: "app-favorite",
-    template: "",
+    template: `
+      <h2>Some stuff and {{ variables }} here
+    `,
     styleUrls: ["./favorite.component.css"]
   })
 === 
+
+We can't mix these two approaches
+
+What's better? It depends
+
+If a component is small and simple - the inline seems to be a better
+solution.
+But when your template is more than, say, 5 lines of code - 
+you'd rather put it to a separate file
+
+And just another tip
+When compiling, our template files go to the 'main.js' bundle
+We can see it in our Chrome Network tab
 
 // 9 - Styles
 
 There are three ways to apply styles:
 
-1. use
+1. use 'styleUrls' in the component meta-data:
 
 styleUrls: ["./favorite.component.css"]
 
 in component meta-data
 Here we have an array with one or more CSS files.
+You can have a master template and additional skins 
+to apply atop of it
 
-2. Using a 'style' property:
+2. Using a 'style' property. We can use backticks to
+break the code for multiple lines:
 
   styles: [
       `
@@ -249,6 +337,9 @@ Here we have an array with one or more CSS files.
 
   3. And we can write them in our HTML-document, using <style></style> tag
 
+As said earlier, Angular will override the styles and picks up those that came last.
+And it won't allow to leak styles outside the scope of the component.
+
 // 10 - View Encapsulation
 
 Styles used in 'styleUrls: ["./favorite.component.css"]' will never leak up to other  components.
@@ -259,6 +350,47 @@ And how does it work?
 Shadow DOM - allows us to apply scoped styles to elements without bleeding out to the outer world.
 
 THis feature is not supported in older browsers.
+
+Let's have a look at good old JS code:
+
+var el = document.querySelector('favorite');
+
+el.innerHTML = `
+  <style><h1> { color: 'red' }</h1></style>
+  <h1>Hello</h1>
+`;
+
+THis way, the style settings will be applied anywhere in the document
+
+We can override it by adding a line:
+
+var el = document.querySelector('favorite');
+var root = el.createShadowRoot();
+root.innerHTML = `
+  <style><h1> { color: 'red' }</h1></style>
+  <h1>Hello</h1>
+`;
+
+Now style settings won't leak outside the shadow root 'root'
+
+In Angular we have a concept of 'view encapculation'
+
+If we import 'ViewEncapsulation' module from @angular/core,
+and add 'encapsulation' as component metadata:
+
+@Component({
+  selector: "favorite",
+  templateUrl: "./favorite.component.html",
+  styleUrls: ["./favorite.component.css"],
+  encapsulation: ViewEncapsulation.Emulated
+})
+
+Angular will suggest a set of options:
+
+- 'Emulated' - emulates shadow DOM, to work in older browsers
+- 'Native' - as is in the given browser
+- 'None' - without shadow DOM
+- and the recent one 'ShadowDom'
 
 In most cases, default settings of Agular will do
 
@@ -273,6 +405,7 @@ Then we change  the selector name to:
 ===
 selector: 'bootstrap-panel',
 ====
+in order to not conflict with other names of components
 
 In 'panel.component.html' we print
 
@@ -297,11 +430,15 @@ After TABbing we get:
 </div>
 ====
 
-If we simply add some text to these two divs (panel-heading and panel-body) - we'll get a beautiful mark-up
+If we simply add some text to these two divs (panel-heading and panel-body) - 
+we'll get a beautiful mark-up if we render this 'panel' component in
+our App.html:
+
+<bootstrap-panel></bootstrap-panel>
 
 But if we want to add some content over there dynamically?
 
-We could define property bindings in 'app.component.ts':
+We could define property bindings in 'app.component.html':
 
 ===
 <bootstrap-panel [body]="body"></bootstrap-panel>
@@ -311,7 +448,7 @@ But this approach is a little weird.
 
 We could use 'ngContent' element instead.
 
-First we provide two injection points:
+First we provide two injection points (panel template):
 
 ====
 <div class="panel panel-default">
@@ -333,6 +470,18 @@ id or an element:
 <ng-content select=".heading"></ng-content>
 =====
 
+and
+
+=====
+<ng-content select=".body"></ng-content>
+=====
+
+So if the consumer of this 'panel' component has an element that matches
+this selector - which means an element with a 'heading' class, that element
+is going to be placed right here - instead of 'ng-content'
+
+In other words, ng-content will be replaced with that element.
+
 Now in 'app.component.html' we add two divs:
 
 div.heading+div.body
@@ -349,9 +498,31 @@ And we get
 </bootstrap-panel>
 =====
 
+In 'panel.html':
+
+=====
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <ng-content select=".heading"></ng-content>
+  </div>
+
+  <div>
+    <div class="panel-body">
+      <ng-content select=".body"></ng-content>
+    </div>
+  </div>
+</div>
+=====
+
 And you don't need a selector if you have only one ng-content
 
 // 12 - ngContainer
+
+The previous example works beautifully, but what if we don't want
+to display extra 'div' while replacing the actual contents with 'ng-content'?
+(By default, Angular looks for element specified in 'ng-content' by its
+class, id or other element). What if we simply want to dislay raw text
+and nothing more?
 
 If you want to render something without putting it into a 'div' or other element,
 use 'ng-container'. 
@@ -367,6 +538,35 @@ in 'app.component.html', use simply
 ===
 <ng-container class="heading">Heading</ng-container>
 =====
+
+// 13 - Exercise - LikeComponent
+
+Implement a 'Like' button shaped 'heart'
+If you click on it, the counter increases by 1 and the heart goes pink
+If you click it again, heart turns grey and counter switches to 0 again
+If you hover a mouse over 'Like' icon, mouse pointer switches to a hand
+
+The default color of the heart is grey - 'color: #ccc'
+For active mode use 'color: deeppink'
+Cursor attribute uses 'cursor: pointer'
+
+The reusable 'Like' component will have two input properties -
+totalNumberOfLikes and a boolean property telling if the user
+liked it or not
+
+In App we have an object with three properties:
+
+tweet = {
+  body: 'Here is the body of a tweet',
+  isLiked: false,
+  likesCount: 0
+}
+
+In 'app.html' we have this 'like' component:
+
+<like
+ [likesCount]="tweet.likesCount"
+ [isActive]="tweet.isLiked"></like>
 
 // 14 - Exercise - Like Component
 

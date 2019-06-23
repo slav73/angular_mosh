@@ -8,9 +8,13 @@ import { CoursesComponent } from "./courses.component";
 import { CoursesService } from "./courses.service";
 import { AuthorsService } from "./authors.service";
 import { AuthorsComponent } from "./authors.component";
+import { FavoriteComponent } from './favorite/favorite.component';
+import { PanelComponent } from './panel/panel.component';
+import { InputFormatDirective } from './input-format.directive';
+import { ContactFormComponent } from './contact-form/contact-form.component';
 
 @NgModule({
-  declarations: [AppComponent, AuthorsComponent, CoursesComponent],
+  declarations: [AppComponent, AuthorsComponent, CoursesComponent, FavoriteComponent, PanelComponent, InputFormatDirective, ContactFormComponent],
   imports: [BrowserModule, FormsModule, AppRoutingModule],
   providers: [AuthorsService, CoursesService],
   bootstrap: [AppComponent]
