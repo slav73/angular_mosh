@@ -124,7 +124,7 @@ Another way - is explicitly create these control objects. We call forms that are
 What is the difference? 
 
 When we create the control explicitly = we have more control over 'validation logic'. 
-So if you build complex forms and need more control - use this way. And anothe benefir -
+So if you build complex forms and need more control - use this way. And another benefit -
 you can use the validation logic to test these forms.
 
 Otherwise, if you build simple forms that need only basic validation - use template driven forms.
@@ -159,16 +159,18 @@ Now let's implement this log method:
 
 =====
 export class ContactFormComponent {
-log(x) {
-  console.log(x);
-}
-
+  log(x) {
+    console.log(x);
+  }
 }
 =====
 
 Now when we type something in the 'firstName' field, in the console appears 
-an 'ngModel' object with a bunch of properties (valid, invalid, value, dirty, pristine etc)
+an 'ngModel' object with a bunch of properties 'control': (valid, invalid, value, dirty, pristine etc)
 
+The most interesting is 'control.value' - it contains the text typed in the field
+
+Now we add 'ngModel' to text area - for Angular to have control over that field too:
 =====
 <textarea
       id="comment"
@@ -182,7 +184,8 @@ an 'ngModel' object with a bunch of properties (valid, invalid, value, dirty, pr
 
 // 5 - Adding Validation
 
-Now we add 'required' to a 'firstName' field:
+Now we add 'required' to a 'firstName' field (In HTML5 we have this 
+  validation and Angular will use it):
 
 ====
 <input
@@ -197,7 +200,9 @@ Now we add 'required' to a 'firstName' field:
     />
 =====
 
-and then add a div under that field to show alert message if the firstName field is invalid:
+and then add a div under that field to show alert message if the firstName field is invalid.
+We can use '*ngIf="!firstName.control.valid"' for this, but without mentioning 'control'
+will do too - all the control properties are doubled in 'ngModel' object root:
 
 =====
 <div class="alert alert-danger" *ngIf="!firstName.valid">
@@ -238,6 +243,7 @@ validation error:
   ngModel
   required
   minlength='5'
+  maxlength='10'
   pattern="banana"
   name="firstName"
   #firstName="ngModel"
@@ -276,6 +282,11 @@ We have to add to our styles.css file a new rule with classes that Angular adds 
 // 8 - Cleaner Templates
 
 Formatting code
+
+YOur code should be formatted so that another developer won't have
+to scroll the screen to the right
+
+Simply break the lines and place one attribute to one line
 
 // 9 - ngForm
 
@@ -372,6 +383,8 @@ and state of the form fields:
 
 { "contact": { "firstName": "ba" }, "comment": "cds", "isSubscribed": false }
 
+So adding a checkbox is lke adding a text box - we apply 'ngModel', along with a 'name' attribute
+
 // 14 - Working with Drop-down Lists
 
 div.form-group>label[for="contact-method"]+select[id="contactMethod"].form-control
@@ -381,7 +394,7 @@ TAB
     ><select ngModel name="contactMethod" id="contactMethod" class="form-control"></select>
   </div>
 
-After ajusting:
+After adjusting:
 
 ====
 <div class="form-group">
